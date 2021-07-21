@@ -7,7 +7,7 @@ using System.IO;
 namespace CriPakTools {
     class Program {
         static void Main(string[] args) {
-            Console.WriteLine("CriPakTools\n");
+            Console.WriteLine("CriPakTools.NetCore\n");
             Console.WriteLine(
                 "Based off Falo's code relased on Xentax forums (see readme.txt), modded by Nanashi3 from FuwaNovels.\nInsertion code by EsperKnight\n\n");
 
@@ -40,9 +40,18 @@ namespace CriPakTools {
 
                 List<FileEntry> entries = null;
 
-                entries = (extractMe.ToUpper() == "ALL")
-                    ? cpk.FileTable.Where(x => x.FileType == "FILE").ToList()
-                    : cpk.FileTable.Where(x =>
+                if (extractMe.ToUpper() == "ALL")
+                    entries = cpk.FileTable.Where(x => x.FileType == "FILE").ToList();
+                else if (extractMe.ToUpper().StartsWith("MATCH:")) {
+                    Console.WriteLine("MATCH MODE");
+                    var matchPattern = extractMe.Substring(6);
+                    entries = cpk.FileTable
+                        .Where(x => x.FileType == "FILE")
+                        .Where(x => Wildcard.match(matchPattern, (string) x.FileName))
+                        .ToList();
+                }
+                else
+                    entries = cpk.FileTable.Where(x =>
                         ((x.DirName != null) ? x.DirName + "/" : "") + x.FileName.ToString().ToLower() ==
                         extractMe.ToLower()).ToList();
 
@@ -151,6 +160,18 @@ namespace CriPakTools {
                     File.Delete(outputName);
                 }
             }
+        }
+    }
+
+    public static class Wildcard {
+        public static bool match(string pattern, string str) {
+            return System.Text.RegularExpressions.Regex.IsMatch(str,
+                "^" + System.Text.RegularExpressions.Regex.Escape(pattern).Replace(@"\*", ".*").Replace(@"\?", ".") +
+                "$");
+        }
+
+        public static bool isRaw(string pattern) {
+            return !pattern.Contains('?') && !pattern.Contains('*');
         }
     }
 }
