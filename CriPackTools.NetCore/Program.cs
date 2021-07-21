@@ -7,7 +7,7 @@ using System.IO;
 namespace CriPakTools {
     class Program {
         static void Main(string[] args) {
-            Console.WriteLine("CriPakTools.NetCore\n");
+            Console.WriteLine("CriPakTools.NetCore p.003\n");
             Console.WriteLine(
                 "Based off Falo's code relased on Xentax forums (see readme.txt), modded by Nanashi3 from FuwaNovels.\nInsertion code by EsperKnight\n\n");
 
@@ -66,21 +66,28 @@ namespace CriPakTools {
                         Directory.CreateDirectory(entries[i].DirName.ToString());
                     }
 
-                    oldFile.BaseStream.Seek((long) entries[i].FileOffset, SeekOrigin.Begin);
-                    string isComp = Encoding.ASCII.GetString(oldFile.ReadBytes(8));
-                    oldFile.BaseStream.Seek((long) entries[i].FileOffset, SeekOrigin.Begin);
+                    var entryInternalFn = ((entries[i].DirName != null) ? entries[i].DirName + "/" : "") +
+                        entries[i].FileName.ToString(); // internal file name
 
-                    byte[] chunk = oldFile.ReadBytes(Int32.Parse(entries[i].FileSize.ToString()));
-                    if (isComp == "CRILAYLA") {
-                        int size = Int32.Parse((entries[i].ExtractSize ?? entries[i].FileSize).ToString());
-                        chunk = cpk.DecompressCRILAYLA(chunk, size);
+                    try {
+                        oldFile.BaseStream.Seek((long) entries[i].FileOffset, SeekOrigin.Begin);
+                        string isComp = Encoding.ASCII.GetString(oldFile.ReadBytes(8));
+                        oldFile.BaseStream.Seek((long) entries[i].FileOffset, SeekOrigin.Begin);
+
+                        byte[] chunk = oldFile.ReadBytes(Int32.Parse(entries[i].FileSize.ToString()));
+                        if (isComp == "CRILAYLA") {
+                            int size = Int32.Parse((entries[i].ExtractSize ?? entries[i].FileSize).ToString());
+                            chunk = cpk.DecompressCRILAYLA(chunk, size);
+                        }
+
+                        Console.WriteLine("Extracting: " + entryInternalFn);
+                        File.WriteAllBytes(
+                            ((entries[i].DirName != null) ? entries[i].DirName + "/" : "") + entries[i].FileName.ToString(),
+                            chunk);
                     }
-
-                    Console.WriteLine("Extracting: " + ((entries[i].DirName != null) ? entries[i].DirName + "/" : "") +
-                                      entries[i].FileName.ToString());
-                    File.WriteAllBytes(
-                        ((entries[i].DirName != null) ? entries[i].DirName + "/" : "") + entries[i].FileName.ToString(),
-                        chunk);
+                    catch (Exception ex) {
+                        Console.WriteLine("Failed to extract: " + entryInternalFn + ", exception: " + ex.ToString());
+                    }
                 }
             }
             else {
