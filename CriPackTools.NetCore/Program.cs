@@ -20,6 +20,8 @@ namespace CriPakTools {
                     "CriPakTool.exe IN_FILE REPLACE_ME REPLACE_WITH [OUT_FILE] - Replaces REPLACE_ME with REPLACE_WITH.  Optional output it as a new CPK file otherwise it's replaced.\n");
                 return;
             }
+            
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // for Shift-JIS: https://stackoverflow.com/a/40549315
 
             string cpk_name = args[0];
 

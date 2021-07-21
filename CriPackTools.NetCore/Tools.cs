@@ -44,7 +44,7 @@ namespace CriPakTools {
                 br.BaseStream.Seek(lOffset, SeekOrigin.Begin);
 
                 if (enc == null)
-                    result = Encoding.GetEncoding("SJIS").GetString(br.ReadBytes(i));
+                    result = Encoding.GetEncoding("Shift-JIS").GetString(br.ReadBytes(i));
                 else
                     result = enc.GetString(br.ReadBytes(i));
 
@@ -53,7 +53,7 @@ namespace CriPakTools {
             else {
                 br.BaseStream.Seek(fTemp, SeekOrigin.Begin);
                 if (enc == null)
-                    result = Encoding.GetEncoding("SJIS").GetString(br.ReadBytes(i));
+                    result = Encoding.GetEncoding("Shift-JIS").GetString(br.ReadBytes(i));
                 else
                     result = enc.GetString(br.ReadBytes(i));
 
