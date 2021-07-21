@@ -5,21 +5,14 @@ using System.Text;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace CriPakTools
-{
-    public class Tools
-    {
-
+namespace CriPakTools {
+    public class Tools {
         [DllImport("msvcrt.dll", CallingConvention = CallingConvention.Cdecl)]
         static extern int memcmp(byte[] b1, byte[] b2, long count);
 
-        public Tools()
-        {
+        public Tools() { }
 
-        }
-
-        public string ReadCString(BinaryReader br, int MaxLength = -1, long lOffset = -1, Encoding enc = null)
-        {
+        public string ReadCString(BinaryReader br, int MaxLength = -1, long lOffset = -1, Encoding enc = null) {
             int Max;
             if (MaxLength == -1)
                 Max = 255;
@@ -31,13 +24,11 @@ namespace CriPakTools
             int i = 0;
             string result = "";
 
-            if (lOffset > -1)
-            {
+            if (lOffset > -1) {
                 br.BaseStream.Seek(lOffset, SeekOrigin.Begin);
             }
 
-            do
-            {
+            do {
                 bTemp = br.ReadByte();
                 if (bTemp == 0)
                     break;
@@ -49,8 +40,7 @@ namespace CriPakTools
             else
                 Max = MaxLength;
 
-            if (lOffset > -1)
-            {
+            if (lOffset > -1) {
                 br.BaseStream.Seek(lOffset, SeekOrigin.Begin);
 
                 if (enc == null)
@@ -60,8 +50,7 @@ namespace CriPakTools
 
                 br.BaseStream.Seek(fTemp, SeekOrigin.Begin);
             }
-            else
-            {
+            else {
                 br.BaseStream.Seek(fTemp, SeekOrigin.Begin);
                 if (enc == null)
                     result = Encoding.GetEncoding("SJIS").GetString(br.ReadBytes(i));
@@ -74,19 +63,16 @@ namespace CriPakTools
             return result;
         }
 
-        public void DeleteFileIfExists(string sPath)
-        {
+        public void DeleteFileIfExists(string sPath) {
             if (File.Exists(sPath))
                 File.Delete(sPath);
         }
 
-        public string GetPath(string input)
-        {
+        public string GetPath(string input) {
             return Path.GetDirectoryName(input) + "\\" + Path.GetFileNameWithoutExtension(input);
         }
 
-        public byte[] GetData(BinaryReader br, long offset, int size)
-        {
+        public byte[] GetData(BinaryReader br, long offset, int size) {
             byte[] result = null;
             long backup = br.BaseStream.Position;
             br.BaseStream.Seek(offset, SeekOrigin.Begin);
@@ -94,6 +80,5 @@ namespace CriPakTools
             br.BaseStream.Seek(backup, SeekOrigin.Begin);
             return result;
         }
-
     }
 }
